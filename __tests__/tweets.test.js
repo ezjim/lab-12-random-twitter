@@ -6,6 +6,7 @@ const connect = require('../lib/utils/connect');
 const mongoose = require('mongoose');
 const Tweet = require('../lib/models/Tweet');
 
+
 describe('app routes', () => {
   beforeAll(() => {
     connect();
@@ -53,6 +54,41 @@ describe('app routes', () => {
             __v: 0
           });
         });
+      });
+  });
+
+  it('updates a tweets text by handle', async() => {
+    const tweets = { handle: 'tweet 1', text: 'test text' };
+    return Tweet.create(tweets)
+      .then(tweet => {
+        return request(app)
+          .patch(`/api/v1/tweets/${tweet.id}`)
+          .send({ text: 'test text' });
+      })
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.any(String),
+          handle: 'tweet 1',
+          text: 'test text',
+          __v: 0
+        });
+      });
+  });
+
+  it('deletes a tweet by id', async() => {
+    const tweets = { handle: 'tweet 1', text: 'test text' };
+    return Tweet.create(tweets)
+      .then(tweet => {
+        return request(app)
+          .delete(`/api/v1/tweets/${tweet.id}`)
+          .then(res => {
+            expect(res.body).toEqual({
+              _id: expect.any(String),
+              handle: 'tweet 1',
+              text: 'test text',
+              __v: 0
+            });
+          });
       });
   });
 });
